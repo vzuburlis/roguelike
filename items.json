@@ -1,0 +1,28 @@
+[{
+    "sprite": ["potion", 4, 0],
+    "name": "Potion of healing",
+    "effect": "heal"
+},
+{
+    "sprite": ["potion", 2, 0],
+    "name": "Potion of Strength",
+    "effect": "strength",
+    "effect_time": 12
+},
+{
+    "sprite": ["potion", 1, 0],
+    "name": "Potion of Speed",
+    "effect": "speed",
+    "effect_time": 12
+},
+{
+    "sprite": ["armor", 0, 0],
+    "name": "Armor Upgrade",
+    "effect": "+armor"
+},
+{
+    "sprite": ["shortwep", 0, 0],
+    "name": "Attack Upgrade",
+    "effect": "+attack"
+}
+]

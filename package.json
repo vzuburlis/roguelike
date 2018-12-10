@@ -1,0 +1,16 @@
+{
+	"name":"Map Gen",
+	"version":"1.0.0",
+	"description":"This is the core package of Gila CMS.",
+	"url":"gilacms.com",
+	"logo":"https://gilacms.com/assets/package-logos/core.png",
+	"permissions": {
+		"admin":"All administration privileges",
+		"admin_user":"Administrate users",
+		"admin_userrole":"Administrate user roles",
+		"admin_permissions":"Add and remove permissions to user roles",
+		"upload_assets":"Can upload files on assets folder",
+		"edit_assets":"Can edit files on assets folder"
+	},
+	"lang":"core/lang/admin/"
+}

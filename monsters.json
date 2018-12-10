@@ -1,0 +1,47 @@
+[
+    {
+        "name": "bug",
+        "image": "src/mapgen/Monsters/monster_01.png",
+        "level": 1
+    },
+    {
+        "name": "bug",
+        "image": "src/mapgen/Monsters/monster_01.png",
+        "level": 1
+    },
+    {
+        "name": "rat",
+        "image": "src/mapgen/Monsters/monster_03.png",
+        "level": 2
+    },
+    {
+        "name": "killerbee",
+        "image": "src/mapgen/Monsters/monster_09.png",
+        "level": 3
+    },
+    {
+        "name": "earthcrub",
+        "image": "src/mapgen/Monsters/monster_13.png",
+        "level": 4
+    },
+    {
+        "name": "fleshplant",
+        "image": "src/mapgen/Monsters/monster_72.png",
+        "level": 6
+    },
+    {
+        "name": "firebug",
+        "image": "src/mapgen/Monsters/monster_41.png",
+        "level": 7
+    },
+    {
+        "name": "zombie",
+        "image": "src/mapgen/Monsters/monster_79.png",
+        "level": 8
+    },
+    {
+        "name": "golem",
+        "image": "src/mapgen/Monsters/monster_130.png",
+        "level": 10
+    }
+]
