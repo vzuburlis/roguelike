@@ -11,12 +11,35 @@ body{
 }
 
 #controls {
-    display:none;
+/*    display:none;*/
     overflow: visible;
     position:absolute;
     left:1em;
-    bottom:1em;
+    bottom:4em;
+    border: 1px solid grey;
+    border-radius: 50%;
 }
+.dir-btn {
+    width:3em; height:3em;
+    /*border: 1px solid grey;
+    border-radius: 0.5em;*/
+    display:block;
+}
+#commands {
+    overflow: visible;
+    position:absolute;
+    right:1em;
+    bottom:4em;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.com-btn {
+    filter:greyscale(100%); width:3em; height:3em;
+    border: 1px solid grey;
+    border-radius: 0.5em;
+    margin: 4px;
+}
+.com-down{display:none}
 #msgBox, #statBox {
     position:absolute;
     text-align: center;
@@ -27,11 +50,13 @@ body{
 #statBox { bottom:0; display:grid; grid-template-columns:1fr 1fr 1fr 1fr;font-size:24px}
 #statBox img { width: 32px; height:32px;}
 #statBox span { padding: 4px; }
-#use-menu {
+#map,#use-menu{
     position:absolute;
     top:50%;
     left:50%;
     transform:translate(-50%, -50%);
+}
+#use-menu {
     background:rgba(0,0,0,0.7);
     visibility:hidden;
     border: 2px solid #613214;
@@ -65,7 +90,7 @@ button{
 }
 #use-menu--title{
     font-family: 'Niconne', cursive;
-    font-size: 4em;
+    font-size: 3em;
     text-align:center;
     min-width:300px;
 }
@@ -73,15 +98,23 @@ button{
     text-align:left;
 }
 #use-menu .item-img{
-    width:16px;
-    height:16px;
+    width: 16px;
+    height: 16px;
+    zoom:2;
     display:inline-block;
 }
-
+#use-menu .item-name{
+    font-size: 1.3em;
+}
+@media screen and (max-width: 600px) {
+  #show-u-command {
+    display: none;
+  }
+}
 </style>
 <head>
     <base href="<?=gila::config('base')?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> 
     <?=view::script("lib/gila.min.js")?>
     <?=view::script("src/mapgen/unit.js")?>
     <link href="https://fonts.googleapis.com/css?family=Niconne" rel="stylesheet">
@@ -99,9 +132,34 @@ button{
       
       <div id="controls">
         <table>
-        <tr><td><td><button onclick="player.move(0,-1);renderMap();">U</button><td>
-        <tr><td><button onclick="player.move(-1,0);renderMap();">L</button><td><td><button onclick="player.move(1,0);renderMap();">R</button>
-        <tr><td><td><button onclick="player.move(0,1);renderMap();">D</button><td>
+        <tr>
+          <td>
+          <td>
+          <svg class="dir-btn" viewBox="0 0 28 28" onclick="player.move(0,-1);renderMap();">
+		  <line x1="4" y1="19" x2="15" y2="8" style="stroke:#929292;stroke-width:3"></line>
+		  <line x1="24" y1="19" x2="14" y2="8" style="stroke:#929292;stroke-width:3"></line>
+          </svg>
+          <td>
+        <tr>
+          <td>
+          <svg class="dir-btn" viewBox="0 0 28 28" onclick="player.move(-1,0);renderMap();">
+		  <line y1="4" x1="19" y2="15" x2="8" style="stroke:#929292;stroke-width:3"></line>
+		  <line y1="24" x1="19" y2="14" x2="8" style="stroke:#929292;stroke-width:3"></line>
+          </svg>
+          <td>
+          <td>
+          <svg class="dir-btn" viewBox="0 0 28 28" onclick="player.move(1,0);renderMap();">
+		  <line y1="4" x1="9" y2="15" x2="20" style="stroke:#929292;stroke-width:3"></line>
+		  <line y1="24" x1="9" y2="14" x2="20" style="stroke:#929292;stroke-width:3"></line>
+          </svg>
+        <tr>
+        <td>
+        <td>
+        <svg class="dir-btn" viewBox="0 0 28 28" onclick="player.move(0,1);renderMap();">
+		  <line x1="4" y1="9" x2="15" y2="20" style="stroke:#929292;stroke-width:3"></line>
+		  <line x1="24" y1="9" x2="14" y2="20" style="stroke:#929292;stroke-width:3"></line>
+          </svg>
+        <td>
         </table>
       </div>
       <div></div>
@@ -111,7 +169,7 @@ button{
         <div>Level <?=$c->level?></div>
         <div><img src="<?=$tile_folder?>attack.png"> <span id="pAttack"><span></div>
         <div><img src="<?=$tile_folder?>armor.png"> <span id="pArmor"><span></div>
-        <div><!--img src="<?=$tile_folder?>potion.png"> x<span id="pPotions"--><span> [u] Use Potion</div>
+        <div><span id="show-u-command"> [u] Use Potion</span></div>
       </div>
       <div id="play-btn-container">
           <a href="<?=$play_url?>" class="play-btn">Play Again</a>
@@ -119,8 +177,13 @@ button{
           <p>Enjoyed the game? Follow me on <a target="_blank" href="https://twitter.com/zuburlis">twitter</a> and get notified for new releases and game features.</p>
       </div>
 
+      <div id="commands">
+      <img src="<?=$tile_folder?>potion.png" class="com-btn" onclick="keypressPlay(85)">
+      <img src="<?=$tile_folder?>downstairs.png" class="com-btn com-down" onclick="keypressPlay(32)">
+      </div>
+
       <div id="use-menu">
-        <div id="use-menu--title">Use Item</div>
+        <div id="use-menu--title">Use Item <span onclick="keypressUse(27)" style="font-family:courier new;font-size:0.8em">[x]</span></div>
         <div id="use-menu--list"></div>
       </div>
 </body>
@@ -244,15 +307,6 @@ function renderMap() {
   }
   context.globalAlpha = 1;
 
-  for (i=0; i<monsters.length; i++) if(monsters[i].hp>0){
-      x = monsters[i].x
-      y = monsters[i].y
-      if(mapRev[x][y]>1) {
-          drawImage(x,y, monsterImg[monsters[i].type]);
-          drawLifebar(x,y,monsters[i].hp,monsters[i].maxhp);
-      } 
-  }
-
   for (i=0; i<items.length; i++) if(items[i].carrier==null) {
       x = items[i][0]
       y = items[i][1]
@@ -261,6 +315,15 @@ function renderMap() {
               _t = itemType[items[i][2]].sprite
             drawSprite(x,y, itemImg[_t[0]], _t[1], _t[2]);
           } else drawImage(x,y, itemImg[items[i][2]]);
+      } 
+  }
+
+  for (i=0; i<monsters.length; i++) if(monsters[i].hp>0){
+      x = monsters[i].x
+      y = monsters[i].y
+      if(mapRev[x][y]>1) {
+          drawImage(x,y, monsterImg[monsters[i].type]);
+          drawLifebar(x,y,monsters[i].hp,monsters[i].maxhp);
       } 
   }
 
@@ -369,6 +432,10 @@ function monsterMove (mi, dx, dy) {
 var turnPlayed = false
 var gameScene = "play"
 
+document.dblclick = function(e) { 
+    e.preventDefault();
+}
+
 document.onkeydown = function (e) {
     turnPlayed = false
     e = e || window.event;
@@ -390,7 +457,7 @@ document.onkeydown = function (e) {
 }
 
 function keypressUse (code) {
-    if(code==27) {
+    if(code==27 || code==88) {
         popup = document.getElementById("use-menu")
         popup.style.visibility = 'hidden'
         gameScene = 'play'
@@ -416,6 +483,7 @@ function keypressUse (code) {
 
 function keypressPlay (code) {
     if(player.hp<0) return
+    if(gameScene != 'play') return
 
     if (code == '38') {
         // up arrow
@@ -447,7 +515,7 @@ function keypressPlay (code) {
            src = itemImg[_type.sprite[0]].src
            sx = _type.sprite[1]*16+'px'
            sy = _type.sprite[2]*16+'px'
-           list.innerHTML += '&#'+(i+97)+'; <div class="item-img" style="background: url(\''+src+'\') -'+sx+' -'+sy+'"></div> '+_type.name+'<br>'
+           list.innerHTML += '<div onclick="keypressUse('+(65+i)+')">&#'+(i+97)+'; <div class="item-img" style="background: url(\''+src+'\') -'+sx+' -'+sy+';"></div> <span class="item-name">'+_type.name+'</span></div><br>'
        }
        popup.style.visibility = "visible"
        gameScene = "use-menu"

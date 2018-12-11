@@ -67,9 +67,11 @@ function unitClass (options) {
         }
         that.x += dx;
         that.y += dy;
+        com_down = document.getElementsByClassName('com-down')[0]
         if(map[that.x][that.y]=='>') {
             logMsg("Press [space] to go downstairs");
-        }
+            com_down.style.display = 'block'
+        } else com_down.style.display = 'none'
         if(map[that.x][that.y]=='<') {
             logMsg("You are not thinking to go up");
         }
