@@ -1,123 +1,16 @@
 <?php
 $play_url = 'mapgen/play';
 $update_url = 'mapgen/update';
-$tile_folder = gila::config('base')."src/mapgen/tile/";
+$tile_folder = gila::base_url()."src/mapgen/tile/";
 ?>
-<style>
-body{
-    font-family: courier new;
-    text-align: center;
-    color: white;
-}
 
-#controls {
-/*    display:none;*/
-    overflow: visible;
-    position:absolute;
-    left:1em;
-    bottom:4em;
-    border: 1px solid grey;
-    border-radius: 50%;
-}
-.dir-btn {
-    width:3em; height:3em;
-    /*border: 1px solid grey;
-    border-radius: 0.5em;*/
-    display:block;
-}
-#commands {
-    overflow: visible;
-    position:absolute;
-    right:1em;
-    bottom:4em;
-    display: flex;
-    flex-direction: column-reverse;
-}
-.com-btn {
-    filter:greyscale(100%); width:3em; height:3em;
-    border: 1px solid grey;
-    border-radius: 0.5em;
-    margin: 4px;
-}
-.com-down{display:none}
-#msgBox, #statBox {
-    position:absolute;
-    text-align: center;
-    right:0;
-    left:0;
-}
-#msgBox{ top:0;}
-#statBox { bottom:0; display:grid; grid-template-columns:1fr 1fr 1fr 1fr;font-size:24px}
-#statBox img { width: 32px; height:32px;}
-#statBox span { padding: 4px; }
-#map,#use-menu{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%, -50%);
-}
-#use-menu {
-    background:rgba(0,0,0,0.7);
-    visibility:hidden;
-    border: 2px solid #613214;
-    padding: 8px;
-}
-button{
-    font-size: 3em;
-}
-#play-btn-container{
-    display:none;
-    position: absolute;
-    top:55%;
-    left:0;
-    right:0;
-    text-align:center;
-}
-.play-btn {
-    text-transform: uppercase;
-    padding:1em 2em;
-    font-size:1.5em;
-    font-weight:bold;
-    border-radius:0.5em;
-    border: 2px solid orange;
-    color: orange;
-    text-decoration: none;
-    margin-bottom:2em;
-}
-.play-btn:hover {
-    color: white;
-    background: orange;
-}
-#use-menu--title{
-    font-family: 'Niconne', cursive;
-    font-size: 3em;
-    text-align:center;
-    min-width:300px;
-}
-#use-menu--list{
-    text-align:left;
-}
-#use-menu .item-img{
-    width: 16px;
-    height: 16px;
-    zoom:2;
-    display:inline-block;
-}
-#use-menu .item-name{
-    font-size: 1.3em;
-}
-@media screen and (max-width: 600px) {
-  #show-u-command {
-    display: none;
-  }
-}
-</style>
 <head>
-    <base href="<?=gila::config('base')?>">
+    <base href="<?=gila::base_url()?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> 
     <?=view::script("lib/gila.min.js")?>
     <?=view::script("src/mapgen/unit.js")?>
     <link href="https://fonts.googleapis.com/css?family=Niconne" rel="stylesheet">
+    <link href="src/mapgen/style.css" rel="stylesheet">
 </head>
 <!--
     Credits
@@ -128,34 +21,34 @@ button{
 <body style="background:#000">
     <div id="main">
       
-      <canvas id="map"></canvas>
+      <canvas id="map" ontouch="clickOnMap(event,this)" onclick="clickOnMap(event,this)"></canvas>
       
       <div id="controls">
         <table>
         <tr>
           <td>
           <td>
-          <svg class="dir-btn" viewBox="0 0 28 28" onclick="player.move(0,-1);renderMap();">
+          <svg class="dir-btn" viewBox="0 0 28 28" onclick="keyPress(38)">
 		  <line x1="4" y1="19" x2="15" y2="8" style="stroke:#929292;stroke-width:3"></line>
 		  <line x1="24" y1="19" x2="14" y2="8" style="stroke:#929292;stroke-width:3"></line>
           </svg>
           <td>
         <tr>
           <td>
-          <svg class="dir-btn" viewBox="0 0 28 28" onclick="player.move(-1,0);renderMap();">
+          <svg class="dir-btn" viewBox="0 0 28 28" onclick="keyPress(37)">
 		  <line y1="4" x1="19" y2="15" x2="8" style="stroke:#929292;stroke-width:3"></line>
 		  <line y1="24" x1="19" y2="14" x2="8" style="stroke:#929292;stroke-width:3"></line>
           </svg>
           <td>
           <td>
-          <svg class="dir-btn" viewBox="0 0 28 28" onclick="player.move(1,0);renderMap();">
+          <svg class="dir-btn" viewBox="0 0 28 28" onclick="keyPress(39)">
 		  <line y1="4" x1="9" y2="15" x2="20" style="stroke:#929292;stroke-width:3"></line>
 		  <line y1="24" x1="9" y2="14" x2="20" style="stroke:#929292;stroke-width:3"></line>
           </svg>
         <tr>
         <td>
         <td>
-        <svg class="dir-btn" viewBox="0 0 28 28" onclick="player.move(0,1);renderMap();">
+        <svg class="dir-btn" viewBox="0 0 28 28" onclick="keyPress(40)">
 		  <line x1="4" y1="9" x2="15" y2="20" style="stroke:#929292;stroke-width:3"></line>
 		  <line x1="24" y1="9" x2="14" y2="20" style="stroke:#929292;stroke-width:3"></line>
           </svg>
@@ -169,7 +62,7 @@ button{
         <div>Level <?=$c->level?></div>
         <div><img src="<?=$tile_folder?>attack.png"> <span id="pAttack"><span></div>
         <div><img src="<?=$tile_folder?>armor.png"> <span id="pArmor"><span></div>
-        <div><span id="show-u-command"> [u] Use Potion</span></div>
+        <div id="show-u-command"><span> [u] Use Potion</span></div>
       </div>
       <div id="play-btn-container">
           <a href="<?=$play_url?>" class="play-btn">Play Again</a>
@@ -188,6 +81,7 @@ button{
       </div>
 </body>
 
+
 <script>
 var monsterType = <?=json_encode($c->monsterType)?>;
 var map = <?=json_encode($c->map)?>;
@@ -200,8 +94,16 @@ var monsterImg = [];
 var itemImg = [];
 var statusImg = [];
 var itemType = <?=json_encode($c->itemType)?>;
+var mapWidth = <?=$c->columns?>;
+var mapHeight = <?=$c->rows?>;
+var timeBit = 0;
 renderWidth = 14;
 renderHeight = 7;
+var clientWidth = window.innerWidth
+|| document.documentElement.clientWidth
+|| document.body.clientWidth;
+if(clientWidth<500) renderWidth = 10;
+
 canvas.width = 32*renderWidth*2+32;
 canvas.height = 32*renderHeight*2+32;
 context = canvas.getContext("2d");
@@ -213,35 +115,44 @@ pathImage.src = "<?=$tile_folder?>floor2.png";
 wallImage = new Image();
 wallImage.src = "<?=$tile_folder?>wall.png";
 playerImg = new Image();
-playerImg.src = "<?=$tile_folder?>player.png";
+//playerImg.src = "<?=$tile_folder?>player.png";
+playerImg.src = "<?=gila::base_url()?>src/mapgen/DawnLike/Commissions/Warrior.png";
 upsImg = new Image();
 upsImg.src = "<?=$tile_folder?>upstairs.png"; //oneway_up_1
 downsImg = new Image();
 downsImg.src = "<?=$tile_folder?>downstairs.png"; //oneway_down_1
 //itemImg[0].src = "<?=$tile_folder?>gauze16.png";
 itemImg['shortwep'] = new Image();
-itemImg["shortwep"].src = "<?=gila::config('base')?>src/mapgen/DawnLike/Items/ShortWep.png";
+itemImg["shortwep"].src = "<?=gila::base_url()?>src/mapgen/DawnLike/Items/ShortWep.png";
 itemImg['armor'] = new Image();
-itemImg["armor"].src = "<?=gila::config('base')?>src/mapgen/DawnLike/Items/Armor.png";
+itemImg["armor"].src = "<?=gila::base_url()?>src/mapgen/DawnLike/Items/Armor.png";
 itemImg['potion'] = new Image();
-itemImg['potion'].src =  "<?=gila::config('base')?>src/mapgen/DawnLike/Items/Potion.png";
+itemImg['potion'].src =  "<?=gila::base_url()?>src/mapgen/DawnLike/Items/Potion.png";
 itemImg['shortwep'] = new Image();
-itemImg["shortwep"].src = "<?=gila::config('base')?>src/mapgen/DawnLike/Items/ShortWep.png";
+itemImg["shortwep"].src = "<?=gila::base_url()?>src/mapgen/DawnLike/Items/ShortWep.png";
+itemImg['scroll'] = new Image();
+itemImg["scroll"].src = "<?=gila::base_url()?>src/mapgen/DawnLike/Items/Scroll.png";
 statusImg['strength'] = new Image();
-statusImg['strength'].src = "<?=gila::config('base')?>src/mapgen/status/strength.png";
+statusImg['strength'].src = "<?=gila::base_url()?>src/mapgen/status/strength.png";
 statusImg['speed'] = new Image();
-statusImg['speed'].src = "<?=gila::config('base')?>src/mapgen/status/speed.png";
+statusImg['speed'].src = "<?=gila::base_url()?>src/mapgen/status/speed.png";
 statusImg['bleeding'] = new Image();
-statusImg['bleeding'].src = "<?=gila::config('base')?>src/mapgen/status/bleeding.png";
+statusImg['bleeding'].src = "<?=gila::base_url()?>src/mapgen/status/bleeding.png";
 
 for (i=0; i<monsterType.length; i++) {
     monsterImg[i] = new Image();
-    monsterImg[i].src = "<?=gila::config('base')?>"+monsterType[i].image;
+    monsterImg[i].src = "<?=gila::base_url()?>"+monsterType[i].image;
 }
+monsterImg['pest'] = new Image();
+monsterImg['pest'].src = "<?=gila::base_url()?>src/mapgen/DawnLike/Characters/Quadraped0.png";
+monsterImg['pest1'] = new Image();
+monsterImg['pest1'].src = "<?=gila::base_url()?>src/mapgen/DawnLike/Characters/Quadraped1.png";
 
 for (i=0; i<monsters_data.length; i++) {
     monsters[i] =  unitClass(monsters_data[i]);
 }
+
+var timeBit = 0;
 
 player = unitClass({
     context: canvas.getContext("2d"),
@@ -257,7 +168,6 @@ player = unitClass({
     status: <?=$c->player['status']?>,
     inventory: <?=$c->player['inventory']?>
 });
-updateStats()
 window.focus();
 
 function moveDown() {
@@ -269,7 +179,7 @@ function moveDown() {
         fm.append('status', JSON.stringify(player.status));
         fm.append('level', <?=$c->level+1?>);
         g.ajax({
-            url: '<?=gila::config('base')?><?=$update_url?>',
+            url: '<?=gila::base_url()?><?=$update_url?>',
             data: fm,
             method: 'post',
             fn: function(){
@@ -278,274 +188,43 @@ function moveDown() {
         })
 }
 
-function updateStats() {
-    document.getElementById("pAttack").innerHTML = player.attack;
-    document.getElementById("pArmor").innerHTML = player.armor;
-}
-function renderMap() {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  for (i=0; i< <?=$c->rows?>; i++) {
-    for (j=0; j< <?=$c->columns?>; j++) if (mapRev[j][i]>1) {
-        mapRev[j][i] = 1;
-    }
-  }
-  player.view();
-  for (i=player.y-renderHeight; i<=player.y+renderHeight; i++) {
-    for (j=player.x-renderWidth; j<=player.x+renderWidth; j++) {
-        if (inMap(j,i)) if (mapRev[j][i]>0) {
-            context.globalAlpha = 0.4;
-            if (mapRev[j][i] == 5) context.globalAlpha = 1;
-            if (mapRev[j][i] == 4) context.globalAlpha = 0.9;
-            if (mapRev[j][i] == 3) context.globalAlpha = 0.8;
-            if (mapRev[j][i] == 2) context.globalAlpha = 0.6;
-            if (map[j][i]=='#') drawImage(j,i, wallImage);
-            if (map[j][i]=='.') drawImage(j,i, pathImage);
-            if (map[j][i]=='<') { drawImage(j,i, wallImage);drawImage(j,i, upsImg); }
-            if (map[j][i]=='>') { drawImage(j,i, downsImg); }
-        }
-    }
-  }
-  context.globalAlpha = 1;
+function moveAnimation(dx,dy) {
+    if(dx==0 && dy==1) player.spritey=0
+    if(dx==0 && dy==-1) player.spritey=3
+    if(dx==-1 && dy==0) player.spritey=1
+    if(dx==1 && dy==0) player.spritey=2
+    gameScene = 'wait'
+    player.spritex=1
+    player.x +=dx*0.25
+    player.y +=dy*0.25
+    renderMap2()
 
-  for (i=0; i<items.length; i++) if(items[i].carrier==null) {
-      x = items[i][0]
-      y = items[i][1]
-      if(mapRev[x][y]>1) {
-          if(typeof itemType[items[i][2]]!='undefined') {
-              _t = itemType[items[i][2]].sprite
-            drawSprite(x,y, itemImg[_t[0]], _t[1], _t[2]);
-          } else drawImage(x,y, itemImg[items[i][2]]);
-      } 
-  }
-
-  for (i=0; i<monsters.length; i++) if(monsters[i].hp>0){
-      x = monsters[i].x
-      y = monsters[i].y
-      if(mapRev[x][y]>1) {
-          drawImage(x,y, monsterImg[monsters[i].type]);
-          drawLifebar(x,y,monsters[i].hp,monsters[i].maxhp);
-      } 
-  }
-
-  player.render();
-  drawLifebar(player.x,player.y,player.hp,player.maxhp);
-  drawStatus(player);
-}
-
-function drawStatus(unit) {
-    x = (unit.x-player.x+renderWidth)*32+16-unit.status.length*8
-    y = (unit.y-player.y+renderHeight)*32-16
-    for(i=0; i<unit.status.length; i++) {
-        context.drawImage(
-           statusImg[unit.status[i].effect],
-           0, 0,
-           32, 32,
-           x + i*16, y,
-           16, 16);
-    }
-}
-
-function drawLifebar(x,y,hp,maxhp) {
-    if(hp==maxhp) return
-    x = x-player.x+renderWidth
-    y = y-player.y+renderHeight+1
-    context.fillStyle="#FF0000";
-    context.fillRect(x * 32, y * 32-3, 32, 3); 
-    context.fillStyle="#00FF00";
-    context.fillRect(x * 32, y * 32-3, 32*hp/maxhp, 3); 
-}
-function drawImage (x,y,image) {
-    x = x-player.x+renderWidth
-    y = y-player.y+renderHeight
-    context.drawImage(
-           image,
-           0, 0,
-           16, 16,
-           x * 32, y * 32,
-           32, 32);
-};
-function drawItem (x,y,image) {
-    x = x-player.x+renderWidth
-    y = y-player.y+renderHeight
-    context.drawImage(
-           image,
-           0, 0,
-           16, 16,
-           x * 32+12, y * 32+8,
-           16, 16);
-};
-function drawSprite (x,y,image,sx,sy) {
-    x = x-player.x+renderWidth
-    y = y-player.y+renderHeight
-    context.drawImage(
-           image,
-           sx*16, sy*16,
-           16, 16,
-           x * 32, y * 32,
-           32, 32);
-};
-
-function inMap (x,y) {
-    if(x<0) return false;
-    if(y<0) return false;
-    if(x> <?=$c->columns?>-1) return false;
-    if(y> <?=$c->rows?>-1) return false;
-    return true;
-}
-
-function revealMap() {
-  for (i=0; i< <?=$c->rows?>; i++) {
-    for (j=0; j< <?=$c->columns?>; j++) {
-        mapRev[j][i] = 1;
-    }
-  }
-}
-
-function getMonster(x,y) {
-    for (i=0; i<monsters.length; i++) if(monsters[i].hp>0) {
-      if (x == monsters[i].x && y == monsters[i].y) return i;
-    }
-    return -1;
-}
-function getItem(x,y) {
-    for (i=0; i<items.length; i++) if(items[i].carrier==null) {
-      if (x == items[i][0] && y == items[i][1]) return i;
-    }
-    return -1;
-}
-
-function logMsg(msg) {
-    document.getElementById("msgBox").innerHTML += msg+'<br>';
-}
-
-function status(params) {
-    var that = {};
-    that.timeleft = 1000
-    that.effect = params.effect
-}
-
-
-function monsterMove (mi, dx, dy) {
-    monsters[i].monsterMove(dx, dy)
-}
-
-var turnPlayed = false
-var gameScene = "play"
-
-document.dblclick = function(e) { 
-    e.preventDefault();
-}
-
-document.onkeydown = function (e) {
-    turnPlayed = false
-    e = e || window.event;
-
-    if (gameScene == 'play') {
-        // up arrow
-        keypressPlay(e.keyCode);
-    }
-    else if (gameScene == 'use-menu') {
-        // down arrow
-        keypressUse(e.keyCode);
-    }
-
-    if(turnPlayed == true) {
+    setTimeout(function(){
+        player.spritex=2
+        player.x +=dx*0.25
+        player.y +=dy*0.25
+        renderMap2()
+    },40)
+    setTimeout(function(){
+        player.spritex=3
+        player.x +=dx*0.25
+        player.y +=dy*0.25
+        renderMap2()
+    },80)
+    setTimeout(function(){
+        player.spritex=0
+        player.x +=dx*0.25
+        player.y +=dy*0.25
+        gameScene='play'
         runTurn();
-        if(player.status.length>0) logMsg("player is "+player.status[0].effect+" "+player.status[0].timeleft)
-        renderMap();
-    }
+        renderMap2()
+    },120)
 }
-
-function keypressUse (code) {
-    if(code==27 || code==88) {
-        popup = document.getElementById("use-menu")
-        popup.style.visibility = 'hidden'
-        gameScene = 'play'
-        return
-    }
-    if(code>64 && code<71) {
-        i = code - 65
-        if(i < player.inventory.length) {
-            _type = itemType[player.inventory[i].itemType]
-            logMsg("You drink the " + _type.name);
-            player.inventory[i].stock--
-            if(player.inventory[i].stock==0) player.inventory.splice(i,1);
-            if(_type.effect_time>0) player.addStatus(_type.effect, _type.effect_time)
-            player.addEffect(_type.effect)
-            updateStats()
-            popup = document.getElementById("use-menu")
-            popup.style.visibility = 'hidden'
-            gameScene = 'play'
-            turnPlayed = true
-        }
-    }
-}
-
-function keypressPlay (code) {
-    if(player.hp<0) return
-    if(gameScene != 'play') return
-
-    if (code == '38') {
-        // up arrow
-        player.move(0,-1);
-    }
-    else if (code == '40') {
-        // down arrow
-        player.move(0,1);
-    }
-    else if (code == '37') {
-       // left arrow
-       player.move(-1,0);
-    }
-    else if (code == '39') {
-       // right arrow
-       player.move(1,0);
-    }
-    else if (code == '32') {
-       // right arrow
-       player.moveDown();
-    }
-    else if (code == '85') { //u
-       // i 73
-       popup = document.getElementById("use-menu")
-       list = document.getElementById("use-menu--list")
-       list.innerHTML = ""
-       for(i=0; i<player.inventory.length; i++) {
-           _type = itemType[player.inventory[i].itemType]
-           src = itemImg[_type.sprite[0]].src
-           sx = _type.sprite[1]*16+'px'
-           sy = _type.sprite[2]*16+'px'
-           list.innerHTML += '<div onclick="keypressUse('+(65+i)+')">&#'+(i+97)+'; <div class="item-img" style="background: url(\''+src+'\') -'+sx+' -'+sy+';"></div> <span class="item-name">'+_type.name+'</span></div><br>'
-       }
-       popup.style.visibility = "visible"
-       gameScene = "use-menu"
-       player.moveDown();
-    }
-
-}
-
-function runTurn() {
-    do{
-        for(i=0;i<monsters.length;i++) if(monsters[i].hp>0) {
-            monsters[i].turnTime += 10
-            if(monsters[i].turnTime > 99) {
-                monsters[i].turnTime -= 100
-                monsters[i].monsterPlay()
-            }
-        }
-        player.turnTime += 10+player.speed
-        player.turn()
-    }while(player.turnTime < 100)
-    player.turnTime -= 100
-}
-
-
-setTimeout(function(){
-    player.view();
-    renderMap();
-}, 300);
 
 </script>
+
+<?=view::script("src/mapgen/gameplay.js")?>
+
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130027935-1"></script>
 <script>
