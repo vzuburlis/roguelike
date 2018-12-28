@@ -6,7 +6,7 @@ body{
     font-family: courier new;
     text-align: center;
     color: white;
-    background: url(<?=gila::config('base')?>src/<?=GPACKAGE?>/images/bg.png) no-repeat center center fixed;
+    background: url(<?=gila::base_url()?>src/<?=GPACKAGE?>/images/bg.png) no-repeat center center fixed;
     background-color: black;
     background-size: cover;
 }
@@ -46,7 +46,7 @@ button{
 }
 </style>
 <head>
-    <base href="<?=gila::config('base')?>">
+    <base href="<?=gila::base_url()?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?=view::css("lib/gila.min.css")?>
     <?=view::script("lib/gila.min.js")?>
@@ -79,7 +79,7 @@ button{
         </p>
 
       </div>
-      <a href="<?=$play_url?>" class="play-btn">Play</a>
+      <a href="<?=$play_url?>?v=2" class="play-btn">Play</a>
       <br>
       <br>
       <br>
@@ -90,9 +90,9 @@ button{
         <img src="<?=$tile_folder?>player.png">
         <img src="<?=$tile_folder?>upstairs.png">
         <img src="<?=$tile_folder?>downstairs.png">
-        <img src="<?=gila::config('base')?>src/mapgen/DawnLike/Items/ShortWep.png">
-        <img src="<?=gila::config('base')?>src/mapgen/DawnLike/Items/Potion.png">
-        <img src="<?=gila::config('base')?>src/mapgen/DawnLike/Items/Armor.png">
+        <img src="<?=gila::base_url()?>src/mapgen/DawnLike/Items/ShortWep.png">
+        <img src="<?=gila::base_url()?>src/mapgen/DawnLike/Items/Potion.png">
+        <img src="<?=gila::base_url()?>src/mapgen/DawnLike/Items/Armor.png">
       </div>
     </div>
 </body>

@@ -1,5 +1,5 @@
 [{
-    "sprite": ["potion", 4, 0],
+    "sprite": ["potion", 0, 0],
     "name": "Potion of healing",
     "effect": "heal"
 },
@@ -24,5 +24,26 @@
     "sprite": ["shortwep", 0, 0],
     "name": "Attack Upgrade",
     "effect": "+attack"
+},
+{
+    "sprite": ["scroll", 0, 0],
+    "name": "Scroll of Map",
+    "effect": "map-reveal"
+},
+{
+    "sprite": ["scroll", 1, 0],
+    "name": "Scroll of Invisibility",
+    "effect": "invisible",
+    "effect_time": 12
+},
+{
+    "sprite": ["scroll", 2, 0],
+    "name": "Scroll of Sucrifice",
+    "effect": "sucrifice-rnd"
+},
+{
+    "sprite": ["scroll", 3, 0],
+    "name": "Scroll of Tracking",
+    "effect": "track-all"
 }
 ]

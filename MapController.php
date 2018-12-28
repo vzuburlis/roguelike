@@ -6,9 +6,10 @@ class MapController extends controller
 {
     public $map = [];
     public $mapRev = [];
-    public $rows = 40;
-    public $columns = 40;
-    public $steps = 300;
+    public $rows = 35;
+    public $columns = 35;
+    public $steps = 240;
+    public $tpm = 35;
     public $fClosedSpace = 1;
     public $nClosedSpace = 2;
     public $fDirection = 0;
@@ -57,7 +58,7 @@ class MapController extends controller
         if(isset($_REQUEST['hp'])) {
 
             session::key('player',[
-                "hp" => $_REQUEST['hp'],
+                "hp" => $_REQUEST['hp']+3,
                 "attack" => $_REQUEST['attack'],
                 "armor" => $_REQUEST['armor'],
                 "status" => $_REQUEST['status'],
@@ -96,7 +97,7 @@ class MapController extends controller
                 if($this->forCavePath($pos)) {
                     if($this->getTile($pos[0],$pos[1])=='.') $step--;
                     $this->setTile($pos[0],$pos[1],'.');
-                    if(floor($step/42)>count($this->monsters)) {
+                    if(floor($step/$this->tpm)>count($this->monsters)) {
                        $this->spawnMonster($pos);
                     }
                 } else {
@@ -119,7 +120,10 @@ class MapController extends controller
         $this->addItemByName($this->randPos(),"Attack Upgrade");
         $this->addItemByName($this->randPos(),"Armor Upgrade");
         if($this->level % 2 == 1) {
-            $this->addItem($this->randPos(), rand(0,2));
+        	do{
+        		$rtype = rand(0,8);
+        	}while($rtype==3 || $rtype==4);        	
+            $this->addItem($this->randPos(), $rtype);
         }
         view::renderFile('displayMap.php',GPACKAGE);
     }
@@ -127,14 +131,11 @@ class MapController extends controller
 
     function setTilePos($x,$tile) {
         $this->setTile($x[0],$x[1],$tile);
-        //$this->map[$this->rows*$y + $x] = $tile;
     }
     function setTile($x,$y,$tile) {
         $this->map[$x][$y] = $tile;
-        //$this->map[$this->rows*$y + $x] = $tile;
     }
     function getTile($x,$y) {
-        //return $this->map[$this->rows*$y + $x];
         return $this->map[$x][$y];
     }
 

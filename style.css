@@ -1,0 +1,114 @@
+body{
+    font-family: courier new;
+    text-align: center;
+    color: white;
+}
+
+#controls {
+    overflow: visible;
+    position:absolute;
+    left:1em;
+    bottom:4em;
+    border: 1px solid grey;
+    border-radius: 50%;
+}
+.dir-btn {
+    width:3em; height:3em;
+    /*border: 1px solid grey;
+    border-radius: 0.5em;*/
+    display:block;
+}
+#commands {
+    overflow: visible;
+    position:absolute;
+    right:1em;
+    bottom:4em;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.com-btn {
+    filter:greyscale(100%); width:3em; height:3em;
+    border: 1px solid grey;
+    border-radius: 0.5em;
+    margin: 4px;
+}
+.com-down{display:none}
+#msgBox, #statBox {
+    position:absolute;
+    text-align: center;
+    right:0;
+    left:0;
+}
+#msgBox{ top:0;}
+#statBox { bottom:0; display:grid; grid-template-columns: 1fr 1fr 1fr 1fr;font-size:24px}
+#statBox img { width: 32px; height:32px;}
+#statBox span { padding: 4px; }
+#map,#use-menu{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+}
+#use-menu {
+    background:rgba(0,0,0,0.7);
+    visibility:hidden;
+    border: 2px solid #613214;
+    padding: 8px;
+}
+button{
+    font-size: 3em;
+}
+#play-btn-container{
+    display:none;
+    position: absolute;
+    top:55%;
+    left:0;
+    right:0;
+    text-align:center;
+}
+.play-btn {
+    text-transform: uppercase;
+    padding:1em 2em;
+    font-size:1.5em;
+    font-weight:bold;
+    border-radius:0.5em;
+    border: 2px solid orange;
+    color: orange;
+    text-decoration: none;
+    margin-bottom:2em;
+}
+.play-btn:hover {
+    color: white;
+    background: orange;
+}
+#use-menu--title{
+    font-family: 'Niconne', cursive;
+    font-size: 3em;
+    text-align:center;
+    min-width:300px;
+}
+#use-menu--list{
+    text-align:left;
+}
+#use-menu .item-img{
+    width: 16px;
+    height: 16px;
+    zoom:2;
+    display:inline-block;
+}
+#use-menu .item-name{
+    font-size: 1.3em;
+}
+@media screen and (max-width: 680px) {
+  #show-u-command {
+    display: none;
+  }
+  #statBox {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+@media screen and (min-width: 1000px) {
+    #controls {
+        display:none;
+    }
+}

@@ -1,6 +1,6 @@
 {
-	"name":"Map Gen",
-	"version":"1.0.0",
+	"name":"Roguelike",
+	"version":"1.0.2",
 	"description":"This is the core package of Gila CMS.",
 	"url":"gilacms.com",
 	"logo":"https://gilacms.com/assets/package-logos/core.png",

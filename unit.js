@@ -14,13 +14,24 @@ function unitClass (options) {
     that.type = options.type;
     that.turnTime = 0;
     that.speed = 0;
+    that.spritex = 0;
+    that.spritey = 0;
     that.inventory = [];
     if(typeof options.inventory!='undefined') that.inventory = options.inventory;
     that.status = [];
     if(typeof options.status!='undefined') that.status = options.status;
     
     that.turn = function () {
-        for(i=0;i<that.status.length;i++) {
+    	if(that.hasStatus('bleeding')) {
+    		if(Math.floor(Math.random() * 15) == 0) {
+    		  that.hp--
+    		}
+    		if(that.hp<1) {
+	    		logMsg("<span style='color:red'>You die from bleeding</span>");
+                document.getElementById('play-btn-container').style.display = "block"
+    		}
+    	}
+        for(let i=0;i<that.status.length;i++) {
             that.status[i].timeleft -= 10;
             if(that.status[i].timeleft < 0) {
                 that.removeEffect(that.status[i].effect)
@@ -30,14 +41,16 @@ function unitClass (options) {
     };
 
     that.render = function () {
-        drawImage(that.x,that.y, that.image);
+       if(that.hasStatus('invisible')) context.globalAlpha = 0.5 
+       drawSprite(that.x,that.y, that.image, that.spritex, that.spritey);
+       context.globalAlpha = 1;
     };
 
     that.move = function (dx, dy) {
         document.getElementById("msgBox").innerHTML = "&nbsp;";
         if(map[that.x+dx][that.y+dy]=='#') {
             logMsg("The wall blocks your way");
-            return;
+            return false;
         }
         mi = getMonster(that.x+dx,that.y+dy);
         if(mi > -1) {
@@ -47,8 +60,8 @@ function unitClass (options) {
             monsters[mi].hp-=attack_points;
             if(monsters[mi].hp<0) monsters[mi].hp==0;
             logMsg("You hit the "+monsters[mi].typeName()+' dealing '+attack_points+' damage');
-            turnPlayed = true
-            return;
+            turnPlayed = true;
+            return false;
         }
         iti = getItem(that.x+dx,that.y+dy);
         if(iti>-1) {
@@ -65,6 +78,7 @@ function unitClass (options) {
             }
             updateStats()
         }
+        //moveAnimation(dx,dy)
         that.x += dx;
         that.y += dy;
         com_down = document.getElementsByClassName('com-down')[0]
@@ -72,16 +86,17 @@ function unitClass (options) {
             logMsg("Press [space] to go downstairs");
             com_down.style.display = 'block'
         } else com_down.style.display = 'none'
-        if(map[that.x][that.y]=='<') {
+        if(map[that.x+dx][that.y+dy]=='<') {
             logMsg("You are not thinking to go up");
         }
-        turnPlayed = true
-    }
+        turnPlayed = true;
+			return true
+        }
 
     that.addEffect = function (_effect) {
         if(_effect=="heal") {
-            player.hp += 10
-            if(player.hp > player.maxhp) player.hp = player.maxhp
+            that.hp += 12
+            if(that.hp > that.maxhp) that.hp = that.maxhp
         }
         if(_effect=="+attack") {
             that.attack++
@@ -108,9 +123,44 @@ function unitClass (options) {
         }
         updateStats()
     }
+    that.spellEffect = function (_effect) {
+        if(_effect=="map-reveal") {
+            revealMap()
+        }
+        if(_effect=="sucrifice-rnd") {
+        	ri = Math.floor(Math.random() * monsters.length);
+        	monsters[ri].hp = 0;
+        }
+        if(_effect=="track-all") {
+			for (i=0; i<monsters.length; i++) if(monsters[i].hp>0) {
+            	monsters[i].addStatus("tracked", 8)
+			}
+        }
+        updateStats()
+    }
 
     that.addStatus = function (_effect, _effect_time) {
+	    for(let i=0; i<that.status.length; i++) {
+	    	if(that.status[i].effect == _effect) {
+  		    	if(that.status[i].timeleft<_effect_time*100) {
+  		    	  that.status[i].timeleft = _effect_time*100
+  		    	}
+  		    	return;
+	    	}
+	    }
         that.status.push({timeleft:_effect_time*100,effect:_effect})
+    }
+    that.hasStatus = function (_effect) {
+	    for(let i=0; i<that.status.length; i++) {
+	    	if(that.status[i].effect == _effect) return true
+	    }
+	    return false
+    }
+    that.removeStatus = function (_effect) {
+	    for(let i=0; i<that.status.length; i++) {
+	    	if(that.status[i].effect == _effect) that.status.split(i,1)
+	    }
+	    return false
     }
 
     that.monsterMove = function (dx, dy) {
@@ -123,10 +173,16 @@ function unitClass (options) {
             return;
         }
         if(player.x==_x && player.y==_y) {
+            _mt = monsterType[that.type]
             attack_points = Math.floor(Math.random() * monsterType[that.type].level)+1;
-            attack_points -= Math.floor(Math.random() * player.armor)
+            attack_points -= Math.floor(Math.random() * (player.armor+1))
             if(attack_points<0) attack_points = 0
             player.hp -= attack_points;
+            if(Math.floor(Math.random() * 10)==0) {
+              if(typeof _mt['special-attack']!='undefined'){
+                if(_mt['special-attack']=='bleeding') player.addStatus('bleeding',30)
+              }
+            }
             if(player.hp<0) {
                 logMsg("<span style='color:red'>The "+that.typeName()+' kills you</span>');
                 document.getElementById('play-btn-container').style.display = "block"
@@ -140,11 +196,12 @@ function unitClass (options) {
     }
 
     that.monsterPlay = function () {
-        _x = that.x
-        _y = that.y
-        px = player.x
-        py = player.y
-        if(Math.abs(px-_x)<3 && Math.abs(py-_y)<3) {
+        _x = that.x;
+        _y = that.y;
+        px = player.x;
+        py = player.y;
+
+        if(Math.abs(px-_x)<3 && Math.abs(py-_y)<3 && !player.hasStatus('invisible')) {
             dx = spaceship(px,_x)
             if(dx == 0) dy = spaceship(py,_y); else dy=0;
             if(map[_x+dx][_y+dy]=='#') [dx,dy] = [dy,dx]
@@ -153,7 +210,7 @@ function unitClass (options) {
             that.monsterMove(Math.floor(Math.random() * 3)-1, 0);
         } else {
             that.monsterMove(0, Math.floor(Math.random() * 3)-1);
-        }    
+        }
     }
 
     that.typeName = function () {
@@ -166,16 +223,19 @@ function unitClass (options) {
             logMsg("You have not done with the creatures of this level");
             return
         }
-        logMsg('You go downstairs...')
-        moveDown()
+        logMsg('You go downstairs...');
+        gameScene = 'waiting';
+        moveDown();
     }
 
     that.view = function () {
-        mapRev[that.x][that.y] = 4;
-        for(i=that.x-4; i<that.x+5; i++) {
-            for(j=that.y-4; j<that.y+5; j++) {
-                diffx = i-that.x;
-                diffy = j-that.y;
+        _x = Math.floor(that.x)
+        _y = Math.floor(that.y)
+        mapRev[_x][_y] = 4;
+        for(i=_x-4; i<_x+5; i++) {
+            for(j=_y-4; j<_y+5; j++) {
+                diffx = i-_x;
+                diffy = j-_y;
 
                 if(Math.abs(diffy)>Math.abs(diffx)) {
                     dx = diffx / diffy;
@@ -189,8 +249,8 @@ function unitClass (options) {
                 p = 0; loop = true;
                 do {
                     p++;
-                    x = Math.round(p*dx)+that.x;
-                    y = Math.round(p*dy)+that.y;
+                    x = Math.round(p*dx)+_x;
+                    y = Math.round(p*dy)+_y;
                     if(inMap(x,y)) {
                         dist = Math.sqrt( Math.pow(p*dx, 2) + Math.pow(p*dy, 2) )
                         mapRev[x][y] = 5;
@@ -213,14 +273,10 @@ function spaceship(val1, val2) {
     if ((val1 === null || val2 === null) || (typeof val1 != typeof val2)) {
       return null;
     }
-    if (typeof val1 === 'string') {
-      return (val1).localeCompare(val2);
-    } else {
-      if (val1 > val2) {
-        return 1;
-      } else if (val1 < val2) {
-        return -1;
-      }
-      return 0;
+    if (val1 > val2) {
+      return 1;
+    } else if (val1 < val2) {
+      return -1;
     }
+    return 0;
   }
